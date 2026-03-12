@@ -33,6 +33,16 @@ module Decidim
             decidim_original_convert_to_text(text)
           end
 
+          # The original convert to text does not parses dt/dd items
+          def convert_to_text(text)
+            text.gsub!(%r{(</dt>)}i, "\n\\1")
+            text.gsub!(%r{[\s]*<dd[^>]*>[\s]*(.*)[\s]*</dd+>}i) do |s|
+              s.gsub!(%r{(</div>)}i, "\n\\1")
+            end
+
+            decidim_original_convert_to_text(text)
+          end
+
           protected
 
           # Override the standard `:votes` column with the weighted breakdown
