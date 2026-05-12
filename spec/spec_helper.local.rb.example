@@ -1,0 +1,77 @@
+# frozen_string_literal: true
+
+# Copy this file to `spec/spec_helper.local.rb` to apply machine-specific
+# overrides on top of spec/spec_helper.rb. The real file is gitignored.
+#
+# Example below: pinned Selenium binaries for macOS arm64 plus Capybara driver
+# overrides (`:headless_chrome`, `:pwa_chrome`, `:iphone`). Adjust paths and
+# options to match your platform, or delete sections you do not need.
+
+current_module_lib = File.expand_path("../lib", __dir__)
+bundled_module_lib = File.expand_path("../../decidim/decidim-decidim_awesome/lib", __dir__)
+$LOAD_PATH.delete(bundled_module_lib)
+$LOAD_PATH.unshift(current_module_lib) unless $LOAD_PATH.first == current_module_lib
+
+host_resolver_rules = "MAP *.lvh.me 127.0.0.1, MAP lvh.me 127.0.0.1"
+chromedriver_binary = Dir[File.expand_path("~/.cache/selenium/chromedriver/mac-arm64/*/chromedriver")].max
+chrome_binary = Dir[File.expand_path("~/.cache/selenium/chrome/mac-arm64/*/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing")].max
+chrome_service = if chromedriver_binary && File.exist?(chromedriver_binary)
+                   Selenium::WebDriver::Chrome::Service.new(path: chromedriver_binary)
+                 end
+
+Capybara.register_driver :headless_chrome do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.binary = chrome_binary if chrome_binary && File.exist?(chrome_binary)
+  options.args << "--explicitly-allowed-ports=#{Capybara.server_port}"
+  options.args << "--host-resolver-rules=#{host_resolver_rules}"
+  options.args << "--headless=new"
+  options.args << "--disable-search-engine-choice-screen"
+  options.args << "--disable-dev-shm-usage"
+  options.args << "--no-sandbox"
+  options.args << if ENV["BIG_SCREEN_SIZE"].present?
+                    "--window-size=1920,3000"
+                  else
+                    "--window-size=1920,1080"
+                  end
+  options.args << "--ignore-certificate-errors" if ENV["TEST_SSL"]
+
+  options.add_preference(:download,
+                         directory_upgrade: true,
+                         prompt_for_download: false,
+                         default_directory: DownloadHelper::PATH.to_s)
+  options.add_preference(:browser, set_download_behavior: { behavior: "allow" })
+
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options:, service: chrome_service)
+end
+
+Capybara.register_driver :pwa_chrome do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.binary = chrome_binary if chrome_binary && File.exist?(chrome_binary)
+  options.args << "--explicitly-allowed-ports=#{Capybara.server_port}"
+  options.args << "--host-resolver-rules=#{host_resolver_rules}"
+  options.args << "--no-sandbox"
+  options.args << "--disable-dev-shm-usage"
+  options.args << "--unsafely-treat-insecure-origin-as-secure=http://pwa.lvh.me:#{Capybara.server_port}"
+  options.args << "--user-data-dir=/tmp/decidim_tests_user_data_#{rand(1000)}"
+  options.args << if ENV["BIG_SCREEN_SIZE"].present?
+                    "--window-size=1920,3000"
+                  else
+                    "--window-size=1920,1080"
+                  end
+  options.local_state["browser.enabled_labs_experiments"] = ["enable-system-notifications@1", "unsafely-treat-insecure-origin-as-secure"]
+  options.prefs["profile.default_content_setting_values.notifications"] = 1
+
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options:, service: chrome_service)
+end
+
+Capybara.register_driver :iphone do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.binary = chrome_binary if chrome_binary && File.exist?(chrome_binary)
+  options.args << "--host-resolver-rules=#{host_resolver_rules}"
+  options.args << "--headless=new"
+  options.args << "--no-sandbox"
+  options.args << "--disable-dev-shm-usage"
+  options.add_emulation(device_name: "iPhone XR")
+
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options:, service: chrome_service)
+end

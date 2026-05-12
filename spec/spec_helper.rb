@@ -12,3 +12,6 @@ require "decidim/dev/test/base_spec_helper"
 def legacy_version?
   Decidim::DecidimAwesome.legacy_version?
 end
+
+local_helper = File.expand_path("spec_helper.local.rb", __dir__)
+require local_helper if File.exist?(local_helper)

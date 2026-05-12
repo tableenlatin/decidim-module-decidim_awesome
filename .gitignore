@@ -24,3 +24,29 @@ node_modules/
 npm_debug.log
 
 .rubocop-http*
+
+# macOS
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+
+# editor swap/backup files
+*.swp
+*.swo
+*~
+*.orig
+*.bak
+
+# JetBrains IDEs
+.idea/
+*.iml
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# local-only spec helper overrides
+spec/spec_helper.local.rb
+
