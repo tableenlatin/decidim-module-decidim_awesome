@@ -90,6 +90,17 @@ describe "Custom Redirections" do
           end
         end
       end
+
+      context "when destination is an external URL" do
+        let(:destination) { "https://www.example.com" }
+
+        it "redirects to destination" do
+          error_controller = Decidim::ErrorsController.new
+          allow(error_controller).to receive(:current_organization).and_return(organization)
+
+          expect(error_controller.send(:custom_redirects_destination, goto)).to eq("#{destination}?#{query}")
+        end
+      end
     end
 
     context "when origin is malformed" do

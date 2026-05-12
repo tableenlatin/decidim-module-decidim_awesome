@@ -93,7 +93,7 @@ module Decidim
         end
 
         def users_for(ids_list)
-          Decidim::User.where(id: ids_list).map { |user| [format_user_name(user), user.id, { data: { is_admin: user.read_attribute("admin") } }] }
+          current_organization.users.where(id: ids_list).map { |user| [format_user_name(user), user.id, { data: { is_admin: user.read_attribute("admin") } }] }
         end
 
         def format_user_name(user)

@@ -90,12 +90,19 @@ module Decidim
 
           segments = path.sub(%r{^/}, "").split("/")
           return if segments.blank?
+          segments.shift if locale_segment?(segments.first)
 
           if segments[0] == "admin"
             segments.shift
             return process_admin_segments(segments)
           end
           process_front_segments(segments)
+        end
+
+        def locale_segment?(segment)
+          return false if segment.blank?
+
+          I18n.available_locales.map(&:to_s).include?(segment)
         end
       end
     end

@@ -48,8 +48,8 @@ shared_examples "activated concerns" do |enabled|
       expect(Decidim::Proposals::ProposalType.included_modules).to include(Decidim::DecidimAwesome::AddProposalTypeCustomFields)
       expect(Decidim::Proposals::ProposalLCell.included_modules).to include(Decidim::DecidimAwesome::ProposalLCellOverride)
       expect(Decidim::Proposals::Proposal.included_modules).to include(Decidim::DecidimAwesome::HasProposalExtraFields)
-      expect(Decidim::Proposals::CollaborativeDraft.included_modules).to include(Decidim::DecidimAwesome::HasProposalExtraFields)
-      expect(Decidim::ContentBlocks::GlobalMenuCell.included_modules).to include(Decidim::DecidimAwesome::GlobalMenuCellOverride)
+      expect(Decidim::Proposals::CollaborativeDraft.included_modules).to include(Decidim::DecidimAwesome::HasProposalExtraFields) if defined?(Decidim::Proposals::CollaborativeDraft)
+      expect(Decidim::ContentBlocks::GlobalMenuCell.included_modules).to include(Decidim::DecidimAwesome::GlobalMenuCellOverride) if defined?(Decidim::ContentBlocks::GlobalMenuCell)
       expect(Decidim::BreadcrumbHelper.included_modules).to include(Decidim::DecidimAwesome::BreadcrumbHelperOverride)
       expect(Decidim::BreadcrumbRootMenuItemPresenter.included_modules).to include(Decidim::DecidimAwesome::BreadcrumbRootMenuItemPresenterOverride)
       expect(Decidim::Proposals::ProposalSerializer.included_modules).to include(Decidim::DecidimAwesome::Proposals::ProposalSerializerOverride)
@@ -72,6 +72,9 @@ shared_examples "activated concerns" do |enabled|
       expect(Decidim::OpenDataExporter.included_modules).to include(Decidim::DecidimAwesome::OpenDataExporterOverride)
       expect(Decidim::Core::ParticipatorySpaceListBase.included_modules).to include(Decidim::DecidimAwesome::ParticipatorySpaceListBaseOverride)
       expect(Decidim::Core::ComponentList.included_modules).to include(Decidim::DecidimAwesome::ComponentListOverride)
+      expect(Decidim::Proposals::ProposalVoteCell.included_modules).to include(Decidim::DecidimAwesome::Proposals::ProposalVoteCellOverride)
+      expect(Decidim::Admin::SettingsHelper.included_modules).to include(Decidim::DecidimAwesome::Admin::SettingsHelperOverride)
+      expect(Decidim::Proposals::Permissions.included_modules).to include(Decidim::DecidimAwesome::Proposals::PermissionsOverride)
     end
 
   else
@@ -92,8 +95,8 @@ shared_examples "activated concerns" do |enabled|
       expect(Decidim::Proposals::ProposalType.included_modules).not_to include(Decidim::DecidimAwesome::AddProposalTypeCustomFields)
       expect(Decidim::Proposals::ProposalLCell.included_modules).not_to include(Decidim::DecidimAwesome::ProposalLCellOverride)
       expect(Decidim::Proposals::Proposal.included_modules).not_to include(Decidim::DecidimAwesome::HasProposalExtraFields)
-      expect(Decidim::Proposals::CollaborativeDraft.included_modules).not_to include(Decidim::DecidimAwesome::HasProposalExtraFields)
-      expect(Decidim::ContentBlocks::GlobalMenuCell.included_modules).not_to include(Decidim::DecidimAwesome::GlobalMenuCellOverride)
+      expect(Decidim::Proposals::CollaborativeDraft.included_modules).not_to include(Decidim::DecidimAwesome::HasProposalExtraFields) if defined?(Decidim::Proposals::CollaborativeDraft)
+      expect(Decidim::ContentBlocks::GlobalMenuCell.included_modules).not_to include(Decidim::DecidimAwesome::GlobalMenuCellOverride) if defined?(Decidim::ContentBlocks::GlobalMenuCell)
       expect(Decidim::BreadcrumbHelper.included_modules).not_to include(Decidim::DecidimAwesome::BreadcrumbHelperOverride)
       expect(Decidim::BreadcrumbRootMenuItemPresenter.included_modules).not_to include(Decidim::DecidimAwesome::BreadcrumbRootMenuItemPresenterOverride)
       expect(Decidim::Proposals::ProposalSerializer.included_modules).not_to include(Decidim::DecidimAwesome::Proposals::ProposalSerializerOverride)
@@ -118,6 +121,9 @@ shared_examples "activated concerns" do |enabled|
       expect(Decidim::OpenDataExporter.included_modules).not_to include(Decidim::DecidimAwesome::OpenDataExporterOverride)
       expect(Decidim::Core::ParticipatorySpaceListBase.included_modules).not_to include(Decidim::DecidimAwesome::ParticipatorySpaceListBaseOverride)
       expect(Decidim::Core::ComponentList.included_modules).not_to include(Decidim::DecidimAwesome::ComponentListOverride)
+      expect(Decidim::Proposals::ProposalVoteCell.included_modules).not_to include(Decidim::DecidimAwesome::Proposals::ProposalVoteCellOverride)
+      expect(Decidim::Admin::SettingsHelper.included_modules).not_to include(Decidim::DecidimAwesome::Admin::SettingsHelperOverride)
+      expect(Decidim::Proposals::Permissions.included_modules).not_to include(Decidim::DecidimAwesome::Proposals::PermissionsOverride)
     end
   end
 end

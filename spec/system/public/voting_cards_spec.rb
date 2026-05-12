@@ -33,6 +33,14 @@ describe "Voting weights with cards" do
   let(:can_accumulate_votes_beyond_threshold) { false }
   let(:minimum_votes_per_user) { 0 }
 
+  def proceed_with_modal
+    page.find(".vote_proposal_modal", visible: :visible).click_on("Proceed")
+  end
+
+  def cancel_with_modal
+    page.find(".vote_proposal_modal", visible: :visible).click_on("Cancel")
+  end
+
   context "when the user is logged in" do
     before do
       login_as user, scope: :user
@@ -539,7 +547,9 @@ describe "Voting weights with cards" do
   shared_examples "authorization requirements" do
     context "when the user is not logged in" do
       it "shows the login modal when trying to vote" do
-        click_on "Green"
+        within ".voting-voting_cards" do
+          click_on "Green"
+        end
 
         expect(page).to have_content("Please log in")
       end
@@ -549,11 +559,12 @@ describe "Voting weights with cards" do
       before do
         login_as user, scope: :user
         visit current_path
+        page.execute_script("window.localStorage.clear()")
       end
 
       it "shows the authorization modal when trying to vote" do
         click_on "Green"
-        click_on "Proceed"
+        proceed_with_modal
 
         expect(page).to have_content("We need to verify your identity")
       end
@@ -572,11 +583,14 @@ describe "Voting weights with cards" do
       before do
         login_as user, scope: :user
         visit current_path
+        page.execute_script("window.localStorage.clear()")
       end
 
       it "allows voting and shows the vote is counted" do
-        click_on "Green"
-        click_on "Proceed"
+        within ".voting-voting_cards" do
+          click_on "Green"
+        end
+        proceed_with_modal
 
         expect(page).to have_content("Change my vote")
       end
@@ -614,10 +628,11 @@ describe "Voting weights with cards" do
       let(:voting_manifest) { :default }
 
       it "does not show voting cards" do
-        expect(page).to have_no_content("Green")
-        expect(page).to have_no_content("Yellow")
-        expect(page).to have_no_content("Red")
-        expect(page).to have_no_content("Abstain")
+        expect(page).to have_no_css(".awesome-voting-card")
+        expect(page).to have_no_css(".vote-action.weight_3")
+        expect(page).to have_no_css(".vote-action.weight_2")
+        expect(page).to have_no_css(".vote-action.weight_1")
+        expect(page).to have_no_css(".abstain-button")
       end
     end
 
@@ -643,7 +658,7 @@ describe "Voting weights with cards" do
               click_on "Green"
             end
 
-            click_on "Proceed"
+        proceed_with_modal
 
             within "#proposal-#{proposal.id}-vote-button" do
               expect(page).to have_content("Change my vote")
@@ -657,7 +672,9 @@ describe "Voting weights with cards" do
               click_on "Yellow"
             end
 
-            click_on "Proceed"
+            within ".vote_proposal_modal" do
+              click_on "Proceed"
+            end
 
             within "#proposal-#{proposal.id}-vote-button" do
               expect(page).to have_content("Change my vote")
@@ -674,7 +691,7 @@ describe "Voting weights with cards" do
               click_on "Red"
             end
 
-            click_on "Proceed"
+            proceed_with_modal
 
             within "#proposal-#{proposal.id}-vote-button" do
               expect(page).to have_content("Change my vote")
@@ -688,7 +705,7 @@ describe "Voting weights with cards" do
               click_on "Abstain"
             end
 
-            click_on "Proceed"
+            proceed_with_modal
 
             within "#proposal-#{proposal.id}-vote-button" do
               expect(page).to have_content("Change my vote")
@@ -701,20 +718,20 @@ describe "Voting weights with cards" do
               click_on "Green"
             end
 
-            click_on "Proceed"
+            proceed_with_modal
 
             within "#proposal-#{proposal.id}-vote-button" do
               expect(page).to have_css(".vote-count[data-weight=\"3\"]", text: "1")
               click_on "Change my vote"
             end
 
-            click_on "Proceed"
+            proceed_with_modal
 
             within "#proposal-#{proposal.id}-vote-button" do
               click_on "Yellow"
             end
 
-            click_on "Proceed"
+            proceed_with_modal
 
             within "#proposal-#{proposal.id}-vote-button" do
               expect(page).to have_css("a.vote-action.weight_2.voted.disabled")
@@ -728,20 +745,20 @@ describe "Voting weights with cards" do
               click_on "Abstain"
             end
 
-            click_on "Proceed"
+            proceed_with_modal
 
             within "#proposal-#{proposal.id}-vote-button" do
               expect(page).to have_css(".abstain-button.voted.disabled")
               click_on "Change my vote"
             end
 
-            click_on "Proceed"
+            proceed_with_modal
 
             within "#proposal-#{proposal.id}-vote-button" do
               click_on "Red"
             end
 
-            click_on "Proceed"
+            proceed_with_modal
 
             within "#proposal-#{proposal.id}-vote-button" do
               expect(page).to have_css("a.vote-action.weight_1.voted.disabled")
@@ -755,7 +772,7 @@ describe "Voting weights with cards" do
               click_on "Green"
             end
 
-            click_on "Proceed"
+            proceed_with_modal
 
             within "#proposal-#{proposal.id}-vote-button" do
               expect(page).to have_css("a.vote-action.weight_3.voted.disabled")
@@ -795,7 +812,7 @@ describe "Voting weights with cards" do
               click_on "Green"
             end
 
-            click_on "Proceed"
+            proceed_with_modal
 
             within "#proposal-#{proposal.id}-vote-button" do
               expect(page).to have_content("Change my vote")
@@ -809,21 +826,31 @@ describe "Voting weights with cards" do
               click_on "Yellow"
             end
 
-            click_on "Proceed"
+            proceed_with_modal
+            visit current_path
 
             within "#proposal-#{proposal.id}-vote-button" do
+              expect(page).to have_content("Change my vote")
               expect(page).to have_css(".vote-count[data-weight=\"2\"]", text: "1")
-              click_on "Change my vote"
+            end
+            click_link "Change my vote", href: /proposal_vote\?from_proposals_list=true&weight=2/
+
+            within ".vote_proposal_modal" do
+              click_on "Proceed"
             end
 
-            click_on "Proceed"
-
+            visit current_path
             within "#proposal-#{proposal.id}-vote-button" do
+              expect(page).to have_no_content("Change my vote")
+              expect(page).to have_css(".vote-count[data-weight=\"2\"]", text: "0")
               click_on "Red"
             end
 
-            click_on "Proceed"
+            within ".vote_proposal_modal" do
+              click_on "Proceed"
+            end
 
+            expect(page).to have_css("#proposal-#{proposal.id}-vote-button")
             within "#proposal-#{proposal.id}-vote-button" do
               expect(page).to have_css("a.vote-action.weight_1.voted.disabled")
               expect(page).to have_css(".vote-count[data-weight=\"1\"]", text: "1")
@@ -844,7 +871,7 @@ describe "Voting weights with cards" do
             click_on "Green"
           end
 
-          click_on "Proceed"
+          proceed_with_modal
 
           within "#proposal-#{proposal.id}-vote-button" do
             expect(page).to have_css(".vote-count[data-weight=\"3\"]", text: "1")
@@ -870,7 +897,7 @@ describe "Voting weights with cards" do
             click_on "Yellow"
           end
 
-          click_on "Proceed"
+          proceed_with_modal
 
           within "#proposal-#{proposal.id}-vote-button" do
             expect(page).to have_css(".vote-count[data-weight=\"2\"]", text: "1")
@@ -927,7 +954,7 @@ describe "Voting weights with cards" do
               click_on "Green"
             end
 
-            click_on "Proceed"
+            proceed_with_modal
 
             expect(page).to have_content("We need to verify your identity")
           end
@@ -953,7 +980,7 @@ describe "Voting weights with cards" do
               click_on "Green"
             end
 
-            click_on "Proceed"
+            proceed_with_modal
 
             within "#proposal-#{proposal.id}-vote-button" do
               expect(page).to have_content("Change my vote")
@@ -1085,6 +1112,7 @@ describe "Voting weights with cards" do
         login_as user, scope: :user
         visit_component
         find(".card__list#proposals__proposal_#{proposal.id}").click
+        page.execute_script("window.localStorage.clear()")
       end
 
       it_behaves_like "modal window behavior"
@@ -1096,6 +1124,7 @@ describe "Voting weights with cards" do
       before do
         login_as user, scope: :user
         visit_component
+        page.execute_script("window.localStorage.clear()")
       end
 
       it_behaves_like "modal window behavior"
@@ -1108,6 +1137,7 @@ describe "Voting weights with cards" do
         login_as user, scope: :user
         visit_component
         find(".card__list#proposals__proposal_#{proposal.id}").click
+        page.execute_script("window.localStorage.clear()")
       end
 
       it "does not show modal after checking skip checkbox" do

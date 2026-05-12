@@ -5,7 +5,8 @@ module Decidim
     # Abstract component class for components without any admin controllers (only settings)
     class UtilsController < DecidimAwesome::ApplicationController
       def form_builder_i18n
-        lang = I18n.locale
+        lang = params[:lang].presence || params[:locale].presence || I18n.locale
+        lang = lang.to_s.delete_suffix(".lang")
         folder = "app/packs/src/vendor/form_builder_langs/"
         file = Decidim::DecidimAwesome::Engine.root.join(folder, "#{lang}.lang")
         file = Dir[Decidim::DecidimAwesome::Engine.root.join(folder, "#{lang}-*.lang")].first unless File.exist?(file)

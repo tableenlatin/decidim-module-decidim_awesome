@@ -44,7 +44,9 @@ module Decidim
         private
 
         def resource
-          @resource ||= Component.find_by(id: params[:id])
+          @resource ||= Decidim::Component.find_by(id: params[:id])&.then do |component|
+            component if component.organization == current_organization
+          end
         end
 
         def private_data

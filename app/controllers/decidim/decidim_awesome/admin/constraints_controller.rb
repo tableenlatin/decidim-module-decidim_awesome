@@ -118,7 +118,10 @@ module Decidim
         end
 
         def constraint
-          @constraint ||= ConfigConstraint.find(params[:id])
+          @constraint ||= ConfigConstraint
+                          .joins(:awesome_config)
+                          .where(decidim_awesome_config: { decidim_organization_id: current_organization.id })
+                          .find(params[:id])
         end
 
         def current_setting

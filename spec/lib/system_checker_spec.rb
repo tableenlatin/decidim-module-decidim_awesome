@@ -12,8 +12,8 @@ module Decidim::DecidimAwesome
       expect(subject.overrides.to_h.length).to eq(6)
     end
 
-    it "has 1 modified files in admin" do
-      expect(subject.overrides["decidim-admin"].files.length).to eq(1)
+    it "has 2 modified files in admin" do
+      expect(subject.overrides["decidim-admin"].files.length).to eq(2)
     end
 
     it "has 1 modified files in assemblies" do
@@ -28,8 +28,8 @@ module Decidim::DecidimAwesome
       expect(subject.overrides["decidim-conferences"].files.length).to eq(1)
     end
 
-    it "has 20 modified files in core" do
-      expect(subject.overrides["decidim-core"].files.length).to eq(20)
+    it "has 22 modified files in core" do
+      expect(subject.overrides["decidim-core"].files.length).to eq(22)
     end
 
     it "has 23 modified files in proposals" do

@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  if (!document.querySelector('[href="/users/sign_out"]')) {
+  if (!document.querySelector('[href$="/users/sign_out"]')) {
     return;
   }
 
@@ -10,6 +10,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveStorage = (key, val) => localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...getStorage(), [key]: val }));
   const findContainer = (el) => el.closest(".awesome-voting-card[data-proposal-id], .voting-voting_cards[data-proposal-id]");
   const isModalOpen = () => window.Decidim.currentDialogs[MODAL_ID]?.isOpen;
+  const triggerVoteAction = (action) => {
+    if (window.Rails?.ajax && action.dataset.remote === "true") {
+      window.Rails.ajax({
+        type: (action.dataset.method || "GET").toUpperCase(),
+        url: action.href,
+        dataType: "script"
+      });
+      return;
+    }
+
+    if (window.Rails?.fire) {
+      window.Rails.fire(action, "click");
+      return;
+    }
+
+    action.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+  };
+  let confirmedAction = null;
 
   const modal = document.querySelector(`[data-dialog="${MODAL_ID}"]`);
   if (!modal) {
@@ -46,23 +64,33 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const container = findContainer(modal.storedAction);
+    const storedAction = modal.storedAction;
+    modal.storedAction = null;
+    confirmedAction = storedAction;
+
+    const container = findContainer(storedAction);
     if (container) {
       container.classList.add("loading");
     }
 
-    modal.storedAction.click();
-    setTimeout(() => window.Decidim.currentDialogs[MODAL_ID]?.close());
+    window.Decidim.currentDialogs[MODAL_ID]?.close();
+    triggerVoteAction(storedAction);
   });
 
   document.body.addEventListener("click", (evt) => {
-    const voteAction = evt.target.closest(".awesome-voting-card .vote-action");
+    const voteAction = evt.target.closest(".vote-action");
     if (!voteAction || voteAction.hasAttribute("data-dialog-open")) {
       return;
     }
 
     const container = findContainer(voteAction);
     if (!container) {
+      return;
+    }
+
+    if (confirmedAction === voteAction) {
+      confirmedAction = null;
+      container.classList.add("loading");
       return;
     }
 
@@ -78,5 +106,5 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       container.classList.add("loading");
     }
-  });
+  }, true);
 });

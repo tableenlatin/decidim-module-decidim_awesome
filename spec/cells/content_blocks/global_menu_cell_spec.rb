@@ -2,8 +2,13 @@
 
 require "spec_helper"
 
-module Decidim
-  describe ContentBlocks::GlobalMenuCell, type: :cell do
+RSpec.describe "Decidim::ContentBlocks::GlobalMenuCell availability" do
+  skip "Decidim 0.32.x does not expose Decidim::ContentBlocks::GlobalMenuCell" unless defined?(Decidim::ContentBlocks::GlobalMenuCell)
+end
+
+if defined?(Decidim::ContentBlocks::GlobalMenuCell)
+  module Decidim
+    describe ContentBlocks::GlobalMenuCell, type: :cell do
     subject { block_cell.call }
     let(:block_cell) { cell(content_block.cell, content_block) }
     let(:organization) { create(:organization) }
@@ -242,6 +247,7 @@ module Decidim
           end
         end
       end
+    end
     end
   end
 end

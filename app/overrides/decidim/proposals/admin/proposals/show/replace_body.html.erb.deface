@@ -1,5 +1,7 @@
-<!-- insert_before "erb[silent]:contains('presented_likes = likes_presenters_for(proposal)')" -->
+<!-- replace "erb[loud]:contains('simple_format(present(proposal).body(strip_tags: true))')" -->
 
-<% unless awesome_proposal_private_custom_fields.blank? %>
-  <%= render partial: "decidim/decidim_awesome/admin/proposals/private_body", locals: { proposal: proposal } %>
+<% if awesome_proposal_custom_fields.blank? %>
+  <%= simple_format(present(proposal).body(strip_tags: true)) %>
+<% else %>
+  <%= render_proposal_body(proposal) %>
 <% end %>

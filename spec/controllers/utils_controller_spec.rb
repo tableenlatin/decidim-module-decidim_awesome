@@ -45,6 +45,17 @@ module Decidim::DecidimAwesome
           expect(response.body).to eq(File.read(Decidim::DecidimAwesome::Engine.root.join("app/packs/src/vendor/form_builder_langs/en-US.lang")))
         end
       end
+
+      context "when the language is passed as a formBuilder path segment" do
+        let(:lang) { "en.lang" }
+        let(:file_path) { Decidim::DecidimAwesome::Engine.root.join("app/packs/src/vendor/form_builder_langs/en-US.lang") }
+
+        it "renders the requested language file" do
+          get :form_builder_i18n, params: { lang: }
+          expect(response).to have_http_status(:ok)
+          expect(response.body).to eq(File.read(file_path))
+        end
+      end
     end
   end
 end
