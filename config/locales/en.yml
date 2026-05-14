@@ -1226,6 +1226,8 @@ en:
             field '%{field}'
           invalid_xml: 'Content couldn''t be parsed: DL/DD elements not found in the
             XML'
+      footer:
+        legal_disclaimer: ''
       map_component:
         map:
           api_not_ready: |

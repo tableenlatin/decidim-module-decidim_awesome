@@ -1,0 +1,6 @@
+<!-- insert_bottom 'ul' -->
+
+<% legal_disclaimer = t("decidim.decidim_awesome.footer.legal_disclaimer", default: "").to_s %>
+<% if legal_disclaimer.present? %>
+  <li><%= legal_disclaimer %></li>
+<% end %>

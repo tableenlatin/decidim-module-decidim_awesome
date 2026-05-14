@@ -1039,6 +1039,8 @@ fr:
         errors:
           invalid_fields: Le contenu n'a pas pu être analysé mais a été assigné au champ '%{field}'
           invalid_xml: 'Le contenu n''a pas pu être analysé: les éléments DL/DD n''ont pas été trouvés dans le XML'
+      footer:
+        legal_disclaimer: ''
       map_component:
         map:
           api_not_ready: |
